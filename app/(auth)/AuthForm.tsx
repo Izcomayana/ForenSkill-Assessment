@@ -11,7 +11,7 @@ import { toast } from "sonner";
 
 export default function AuthForm({ type }: { type: 'login' | 'register' }) {
   const router = useRouter();
-  
+
   const isRegister = type === 'register';
 
   const [formData, setFormData] = useState({
@@ -31,52 +31,52 @@ export default function AuthForm({ type }: { type: 'login' | 'register' }) {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  setLoading(true);
+    setLoading(true);
 
-  try {
-    if (isRegister) {
-      if (formData.password !== formData.confirmPassword) {
-        toast.error("Passwords do not match");
-        setLoading(false);
-        return;
+    try {
+      if (isRegister) {
+        if (formData.password !== formData.confirmPassword) {
+          toast.error("Passwords do not match");
+          setLoading(false);
+          return;
+        }
+
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          formData.email,
+          formData.password
+        );
+
+        await setDoc(doc(db, "users", userCredential.user.uid), {
+          name: formData.name,
+          email: formData.email,
+          createdAt: new Date(),
+        });
+
+        toast.success("Account created successfully 🎉");
+
+        router.push("/dashboard");
+
+      } else {
+        await signInWithEmailAndPassword(
+          auth,
+          formData.email,
+          formData.password
+        );
+
+        toast.success("Login successful 👋");
+
+        router.push("/dashboard");
       }
 
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        formData.email,
-        formData.password
-      );
-
-      await setDoc(doc(db, "users", userCredential.user.uid), {
-        name: formData.name,
-        email: formData.email,
-        createdAt: new Date(),
-      });
-
-      toast.success("Account created successfully 🎉");
-
-      router.push("/dashboard");
-
-    } else {
-      await signInWithEmailAndPassword(
-        auth,
-        formData.email,
-        formData.password
-      );
-
-      toast.success("Login successful 👋");
-
-      router.push("/dashboard");
+    } catch (error: any) {
+      toast.error(error.message || "Something went wrong");
+    } finally {
+      setLoading(false);
     }
-
-  } catch (error: any) {
-    toast.error(error.message || "Something went wrong");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">

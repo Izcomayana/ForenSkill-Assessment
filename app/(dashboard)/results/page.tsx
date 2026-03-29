@@ -68,6 +68,8 @@ export default function ResultsPage() {
   const weakAreas = Object.entries(topicScores).filter(
     ([_, value]) => value < 50
   );
+  
+  const timeSpent = Math.round(Math.random() * 20 + 10); // Mock time
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
@@ -80,22 +82,55 @@ export default function ResultsPage() {
         </p>
       </div>
 
-      {/* Score Card */}
-      <Card className="p-6 space-y-4">
-        <h2 className="text-xl font-semibold">Overall Score</h2>
-
-        <div className="flex items-center justify-between">
-          <p className="text-lg font-medium">
-            {correct} / {total} correct
-          </p>
-          <p className="text-2xl font-bold text-primary">
-            {score}%
-          </p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="p-4 rounded-lg bg-muted/50 text-center space-y-2">
+          <div className="flex items-center justify-center">
+            <div className="relative w-20 h-20">
+              <svg className="absolute inset-0 transform -rotate-90" viewBox="0 0 200 200">
+                {/* Background circle */}
+                <circle
+                  cx="100"
+                  cy="100"
+                  r="90"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.1)"
+                  strokeWidth="8"
+                />
+                {/* Progress circle */}
+                <circle
+                  cx="100"
+                  cy="100"
+                  r="90"
+                  fill="none"
+                  stroke="url(#gradient)"
+                  strokeWidth="8"
+                  strokeDasharray={`${(score / 100) * 565.48} 565.48`}
+                  strokeLinecap="round"
+                  className="transition-all duration-1000"
+                />
+                <defs>
+                  <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#5b7aff" />
+                    <stop offset="100%" stopColor="#00d4ff" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-lg font-bold text-foreground">{score}%</span>
+              </div>
+            </div>
+          </div>
         </div>
-
-        <Progress value={score} className="h-3" />
-      </Card>
-
+        <div className="p-4 rounded-lg bg-muted/50 text-center space-y-2">
+          <p className="text-sm text-muted-foreground">Correct Answers</p>
+          <p className="text-3xl font-bold text-foreground">{correct}/{total}</p>
+        </div>
+        <div className="p-4 rounded-lg bg-muted/50 text-center space-y-2">
+          <p className="text-sm text-muted-foreground">Time Spent</p>
+          <p className="text-3xl font-bold text-foreground">{timeSpent} min</p>
+        </div>
+      </div>
+      
       {/* Topic Breakdown */}
       <Card className="p-6 space-y-4">
         <h2 className="text-xl font-semibold">Topic Breakdown</h2>
@@ -131,21 +166,17 @@ export default function ResultsPage() {
       </Card>
 
       {/* Recommendations */}
-      <Card className="p-6 space-y-4">
-        <h2 className="text-xl font-semibold">Recommendations</h2>
+      <div className="flex items-center justify-between">
+        <p className="text-muted-foreground">
+          {recommendations.length === 0
+            ? "No recommendations needed"
+            : `${recommendations.length} recommendation(s) available`}
+        </p>
 
-        {recommendations.length === 0 ? (
-          <p className="text-emerald-400">
-            You're doing great! No recommendations needed.
-          </p>
-        ) : (
-          <ul className="list-disc pl-5 space-y-2">
-            {recommendations.map((rec, index) => (
-              <li key={index}>{rec}</li>
-            ))}
-          </ul>
-        )}
-      </Card>
+        <Button onClick={() => router.push("/recommendations")}>
+          View Recommendations
+        </Button>
+      </div>
 
       {/* Actions */}
       <div className="flex gap-4">
