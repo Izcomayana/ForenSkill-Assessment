@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { questions } from '@/lib/questions';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -23,13 +23,15 @@ export default function AssessmentPage() {
   const selectedAnswer = answers[currentQuestion.id];
   const isAnswered = selectedAnswer !== undefined;
 
-  useState(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUserId(user.uid);
-      }
-    });
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+    if (user) {
+      setUserId(user.uid);
+    }
   });
+
+  return () => unsubscribe();
+}, []);
 
   const calculateTopicScores = () => {
     const topicStats: Record<string, { correct: number; total: number }> = {};
@@ -57,18 +59,70 @@ export default function AssessmentPage() {
   };
 
   const generateRecommendations = (topicScores: Record<string, number>) => {
-    const recommendations: string[] = [];
+  const recommendations: {
+    topic: string;
+    level: string;
+    message: string;
+    modules: string[];
+  }[] = [];
 
-    Object.entries(topicScores).forEach(([topic, score]) => {
-      if (score < 50) {
-        recommendations.push(`${topic}: Beginner - Needs improvement`);
-      } else if (score < 70) {
-        recommendations.push(`${topic}: Intermediate - Review recommended`);
-      }
-    });
-
-    return recommendations;
+  const moduleMap: Record<string, string[]> = {
+    "Digital Evidence": [
+      "Introduction to Digital Evidence",
+      "Types of Digital Evidence",
+      "Evidence Integrity and Hashing",
+    ],
+    "Chain of Custody": [
+      "Evidence Handling and Documentation",
+      "Maintaining Chain of Custody Records",
+      "Legal Importance of Chain of Custody",
+    ],
+    "Forensic Tools": [
+      "Introduction to Autopsy",
+      "Using FTK Imager",
+      "Disk Imaging and Analysis",
+    ],
+    "Legal Issues": [
+      "Legal and Ethical Requirements in Digital Investigations",
+      "Admissibility of Digital Evidence",
+      "Privacy and Cyber Laws",
+    ],
   };
+
+  Object.entries(topicScores).forEach(([topic, score]) => {
+    if (score < 50) {
+      recommendations.push({
+        topic,
+        level: "Beginner",
+        message: `You need significant improvement in ${topic}.`,
+        modules: moduleMap[topic],
+      });
+    } else if (score < 70) {
+      recommendations.push({
+        topic,
+        level: "Intermediate",
+        message: `You have basic understanding of ${topic}, but improvement is needed.`,
+        modules: moduleMap[topic].slice(0, 2),
+      });
+    }
+  });
+
+  return recommendations;
+};
+
+  // const generateRecommendations = (topicScores: Record<string, number>) => {
+  //   const recommendations: string[] = [];
+
+  //   Object.entries(topicScores).forEach(([topic, score]) => {
+  //     if (score < 50) {
+  //       recommendations.push(`${topic}: Beginner - Needs improvement`);
+  //     } else if (score < 70) {
+  //       recommendations.push(`${topic}: Intermediate - Review recommended`);
+  //     }
+  //   });
+
+  //   return recommendations;
+  // };
 
   const router = useRouter();
 
@@ -265,10 +319,10 @@ export default function AssessmentPage() {
                   key={idx}
                   onClick={() => setCurrentQuestionIndex(idx)}
                   className={`w-3 h-3 rounded-full transition-all duration-200 ${idx === currentQuestionIndex
-                      ? 'bg-primary w-8'
-                      : answers[questions[idx].id] !== undefined
-                        ? 'bg-primary/50'
-                        : 'bg-border'
+                    ? 'bg-primary w-8'
+                    : answers[questions[idx].id] !== undefined
+                      ? 'bg-primary/50'
+                      : 'bg-border'
                     }`}
                   title={`Question ${idx + 1}`}
                 />

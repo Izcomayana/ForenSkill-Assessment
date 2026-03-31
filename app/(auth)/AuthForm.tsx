@@ -1,17 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Lock, Mail, User } from 'lucide-react';
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-import { auth, db } from "@/lib/firebase";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { AlertCircle, CheckCircle2, Lock, Mail, User } from 'lucide-react';
 
 export default function AuthForm({ type }: { type: 'login' | 'register' }) {
-  const router = useRouter();
-  
   const isRegister = type === 'register';
 
   const [formData, setFormData] = useState({
@@ -22,8 +14,11 @@ export default function AuthForm({ type }: { type: 'login' | 'register' }) {
   });
 
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setError('');
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -31,70 +26,56 @@ export default function AuthForm({ type }: { type: 'login' | 'register' }) {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
+    setError('');
+    setSuccess('');
 
-  setLoading(true);
-
-  try {
-    if (isRegister) {
-      if (formData.password !== formData.confirmPassword) {
-        toast.error("Passwords do not match");
-        setLoading(false);
-        return;
-      }
-
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        formData.email,
-        formData.password
-      );
-
-      await setDoc(doc(db, "users", userCredential.user.uid), {
-        name: formData.name,
-        email: formData.email,
-        createdAt: new Date(),
-      });
-
-      toast.success("Account created successfully 🎉");
-
-      router.push("/dashboard");
-
-    } else {
-      await signInWithEmailAndPassword(
-        auth,
-        formData.email,
-        formData.password
-      );
-
-      toast.success("Login successful 👋");
-
-      router.push("/dashboard");
+    if (isRegister && formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
     }
 
-  } catch (error: any) {
-    toast.error(error.message || "Something went wrong");
-  } finally {
-    setLoading(false);
-  }
-};
+    if (!formData.email || !formData.password) {
+      setError('Please fill in all required fields');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      if (isRegister) {
+        console.log('Register:', formData);
+        setSuccess('Account created successfully! Redirecting...');
+      } else {
+        console.log('Login:', formData);
+        setSuccess('Login successful! Redirecting...');
+      }
+    } catch (err) {
+      setError('An error occurred. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Full Name - Register Only */}
       {isRegister && (
         <div className="relative">
-          <label className="block text-xs font-semibold text-slate-300 mb-2 uppercase tracking-wider">
+          <label className="block text-xs font-semibold text-foreground mb-2 uppercase tracking-wider">
             Full Name
           </label>
           <div className="relative">
-            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
               name="name"
               placeholder="John Doe"
               value={formData.name}
               onChange={handleChange}
-              className="w-full pl-10 pr-4 py-3 bg-slate-700/30 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all"
+              className="w-full pl-10 pr-4 py-3 bg-secondary/40 border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 transition-all"
             />
           </div>
         </div>
@@ -102,36 +83,36 @@ export default function AuthForm({ type }: { type: 'login' | 'register' }) {
 
       {/* Email */}
       <div className="relative">
-        <label className="block text-xs font-semibold text-slate-300 mb-2 uppercase tracking-wider">
+        <label className="block text-xs font-semibold text-foreground mb-2 uppercase tracking-wider">
           Email Address
         </label>
         <div className="relative">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="email"
             name="email"
             placeholder="you@example.com"
             value={formData.email}
             onChange={handleChange}
-            className="w-full pl-10 pr-4 py-3 bg-slate-700/30 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all"
+            className="w-full pl-10 pr-4 py-3 bg-secondary/40 border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 transition-all"
           />
         </div>
       </div>
 
       {/* Password */}
       <div className="relative">
-        <label className="block text-xs font-semibold text-slate-300 mb-2 uppercase tracking-wider">
+        <label className="block text-xs font-semibold text-foreground mb-2 uppercase tracking-wider">
           Password
         </label>
         <div className="relative">
-          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="password"
             name="password"
             placeholder="••••••••"
             value={formData.password}
             onChange={handleChange}
-            className="w-full pl-10 pr-4 py-3 bg-slate-700/30 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all"
+            className="w-full pl-10 pr-4 py-3 bg-secondary/40 border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 transition-all"
           />
         </div>
       </div>
@@ -139,20 +120,36 @@ export default function AuthForm({ type }: { type: 'login' | 'register' }) {
       {/* Confirm Password - Register Only */}
       {isRegister && (
         <div className="relative">
-          <label className="block text-xs font-semibold text-slate-300 mb-2 uppercase tracking-wider">
+          <label className="block text-xs font-semibold text-foreground mb-2 uppercase tracking-wider">
             Confirm Password
           </label>
           <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="password"
               name="confirmPassword"
               placeholder="••••••••"
               value={formData.confirmPassword}
               onChange={handleChange}
-              className="w-full pl-10 pr-4 py-3 bg-slate-700/30 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all"
+              className="w-full pl-10 pr-4 py-3 bg-secondary/40 border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 transition-all"
             />
           </div>
+        </div>
+      )}
+
+      {/* Error Message */}
+      {error && (
+        <div className="flex items-start gap-2 p-3 bg-destructive/10 border border-destructive/30 rounded-lg">
+          <AlertCircle className="w-4 h-4 text-destructive mt-0.5 flex-shrink-0" />
+          <p className="text-sm text-destructive">{error}</p>
+        </div>
+      )}
+
+      {/* Success Message */}
+      {success && (
+        <div className="flex items-start gap-2 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
+          <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+          <p className="text-sm text-green-400">{success}</p>
         </div>
       )}
 
@@ -160,11 +157,11 @@ export default function AuthForm({ type }: { type: 'login' | 'register' }) {
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-3 px-4 mt-6 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-slate-600 disabled:to-slate-700 text-white font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:cursor-not-allowed"
+        className="w-full py-3 px-4 mt-6 bg-secondary hover:bg-muted disabled:bg-muted/60 text-secondary-foreground font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:cursor-not-allowed border border-border"
       >
         {loading ? (
           <>
-            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            <div className="w-4 h-4 border-2 border-secondary-foreground/30 border-t-secondary-foreground rounded-full animate-spin"></div>
             <span>{isRegister ? 'Creating Account...' : 'Signing In...'}</span>
           </>
         ) : (
@@ -173,9 +170,193 @@ export default function AuthForm({ type }: { type: 'login' | 'register' }) {
       </button>
 
       {/* Security Note */}
-      <p className="text-xs text-slate-400 text-center mt-4">
+      <p className="text-xs text-muted-foreground text-center mt-4">
         Your information is secure and encrypted
       </p>
     </form>
   );
 }
+
+
+
+// 'use client';
+
+// import { useState } from 'react';
+// import { Lock, Mail, User } from 'lucide-react';
+// import { createUserWithEmailAndPassword } from "firebase/auth";
+// import { signInWithEmailAndPassword } from "firebase/auth";
+// import { doc, setDoc } from "firebase/firestore";
+// import { auth, db } from "@/lib/firebase";
+// import { useRouter } from "next/navigation";
+// import { toast } from "sonner";
+
+// export default function AuthForm({ type }: { type: 'login' | 'register' }) {
+//   const router = useRouter();
+
+//   const isRegister = type === 'register';
+
+//   const [formData, setFormData] = useState({
+//     name: '',
+//     email: '',
+//     password: '',
+//     confirmPassword: '',
+//   });
+
+//   const [loading, setLoading] = useState(false);
+
+//   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     setFormData({
+//       ...formData,
+//       [e.target.name]: e.target.value,
+//     });
+//   };
+
+//   const handleSubmit = async (e: React.FormEvent) => {
+//     e.preventDefault();
+
+//     setLoading(true);
+
+//     try {
+//       if (isRegister) {
+//         if (formData.password !== formData.confirmPassword) {
+//           toast.error("Passwords do not match");
+//           setLoading(false);
+//           return;
+//         }
+
+//         const userCredential = await createUserWithEmailAndPassword(
+//           auth,
+//           formData.email,
+//           formData.password
+//         );
+
+//         await setDoc(doc(db, "users", userCredential.user.uid), {
+//           name: formData.name,
+//           email: formData.email,
+//           createdAt: new Date(),
+//         });
+
+//         toast.success("Account created successfully 🎉");
+
+//         router.push("/dashboard");
+
+//       } else {
+//         await signInWithEmailAndPassword(
+//           auth,
+//           formData.email,
+//           formData.password
+//         );
+
+//         toast.success("Login successful 👋");
+
+//         router.push("/dashboard");
+//       }
+
+//     } catch (error: any) {
+//       toast.error(error.message || "Something went wrong");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   return (
+//     <form onSubmit={handleSubmit} className="space-y-4">
+//       {/* Full Name - Register Only */}
+//       {isRegister && (
+//         <div className="relative">
+//           <label className="block text-xs font-semibold text-slate-300 mb-2 uppercase tracking-wider">
+//             Full Name
+//           </label>
+//           <div className="relative">
+//             <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+//             <input
+//               type="text"
+//               name="name"
+//               placeholder="John Doe"
+//               value={formData.name}
+//               onChange={handleChange}
+//               className="w-full pl-10 pr-4 py-3 bg-slate-700/30 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all"
+//             />
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Email */}
+//       <div className="relative">
+//         <label className="block text-xs font-semibold text-slate-300 mb-2 uppercase tracking-wider">
+//           Email Address
+//         </label>
+//         <div className="relative">
+//           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+//           <input
+//             type="email"
+//             name="email"
+//             placeholder="you@example.com"
+//             value={formData.email}
+//             onChange={handleChange}
+//             className="w-full pl-10 pr-4 py-3 bg-slate-700/30 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all"
+//           />
+//         </div>
+//       </div>
+
+//       {/* Password */}
+//       <div className="relative">
+//         <label className="block text-xs font-semibold text-slate-300 mb-2 uppercase tracking-wider">
+//           Password
+//         </label>
+//         <div className="relative">
+//           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+//           <input
+//             type="password"
+//             name="password"
+//             placeholder="••••••••"
+//             value={formData.password}
+//             onChange={handleChange}
+//             className="w-full pl-10 pr-4 py-3 bg-slate-700/30 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all"
+//           />
+//         </div>
+//       </div>
+
+//       {/* Confirm Password - Register Only */}
+//       {isRegister && (
+//         <div className="relative">
+//           <label className="block text-xs font-semibold text-slate-300 mb-2 uppercase tracking-wider">
+//             Confirm Password
+//           </label>
+//           <div className="relative">
+//             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+//             <input
+//               type="password"
+//               name="confirmPassword"
+//               placeholder="••••••••"
+//               value={formData.confirmPassword}
+//               onChange={handleChange}
+//               className="w-full pl-10 pr-4 py-3 bg-slate-700/30 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all"
+//             />
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Submit Button */}
+//       <button
+//         type="submit"
+//         disabled={loading}
+//         className="w-full py-3 px-4 mt-6 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-slate-600 disabled:to-slate-700 text-white font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:cursor-not-allowed"
+//       >
+//         {loading ? (
+//           <>
+//             <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+//             <span>{isRegister ? 'Creating Account...' : 'Signing In...'}</span>
+//           </>
+//         ) : (
+//           <span>{isRegister ? 'Create Account' : 'Sign In'}</span>
+//         )}
+//       </button>
+
+//       {/* Security Note */}
+//       <p className="text-xs text-slate-400 text-center mt-4">
+//         Your information is secure and encrypted
+//       </p>
+//     </form>
+//   );
+// }
