@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { questions } from '@/lib/questions';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -23,13 +23,15 @@ export default function AssessmentPage() {
   const selectedAnswer = answers[currentQuestion.id];
   const isAnswered = selectedAnswer !== undefined;
 
-  useState(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUserId(user.uid);
-      }
-    });
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+    if (user) {
+      setUserId(user.uid);
+    }
   });
+
+  return () => unsubscribe();
+}, []);
 
   const calculateTopicScores = () => {
     const topicStats: Record<string, { correct: number; total: number }> = {};

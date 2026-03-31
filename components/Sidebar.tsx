@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BarChart3, BookOpen, Home, LogOut, Settings, Trophy, User } from 'lucide-react';
+import { BarChart3, BookOpen, Home, LogOut, Settings, Info, } from 'lucide-react';
+import LogoutButton from './Logout';
 
 const navItems = [
   {
@@ -21,14 +22,9 @@ const navItems = [
     icon: BarChart3,
   },
   {
-    label: 'Progress',
-    href: '/progress',
-    icon: Trophy,
-  },
-  {
-    label: 'Profile',
-    href: '/profile',
-    icon: User,
+    label: 'Recommendations',
+    href: '/recommendations',
+    icon: Info,
   },
 ];
 
@@ -80,12 +76,17 @@ export default function Sidebar() {
           <span className="font-medium">Settings</span>
         </Link>
 
-        <button
+
+<div className="mt-auto pt-6 border-t border-border">
+  <LogoutButton />
+</div>
+
+        {/* <button
           className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-foreground hover:bg-muted/50 transition-all duration-200"
         >
           <LogOut size={20} />
           <span className="font-medium">Logout</span>
-        </button>
+        </button> */}
       </div>
     </aside>
   );

@@ -1,7 +1,21 @@
+"use client"
+
+import { useAuth } from '@/context/AuthContext';
 import AuthForm from '../AuthForm';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function LoginPage() {
+    const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.push('/dashboard');
+    }
+  }, [user, loading, router]);
+  
   return (
     <>
       <AuthForm type="login" />
