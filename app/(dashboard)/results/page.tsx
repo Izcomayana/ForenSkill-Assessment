@@ -166,7 +166,7 @@ export default function ResultsPage() {
       </Card>
 
       {/* Recommendations */}
-      <div className="flex items-center justify-between">
+      <div className="items-center justify-between flex flex-col gap-4 md:flex">
         <p className="text-muted-foreground">
           {recommendations.length === 0
             ? "No recommendations needed"

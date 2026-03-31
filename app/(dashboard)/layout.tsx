@@ -10,9 +10,8 @@ export default function DashboardLayout({
     <ProtectedRoute>
       <div className="flex">
         <Sidebar />
-        <main className="flex-1 ml-64 min-h-screen bg-background">
-          <div className="p-8">
-
+        <main className="flex-1 min-h-screen bg-background lg:ml-64">
+          <div className="p-4">
             {children}
           </div>
         </main>

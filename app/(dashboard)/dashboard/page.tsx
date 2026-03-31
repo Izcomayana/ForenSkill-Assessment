@@ -1,6 +1,7 @@
 'use client';
 
 import { BarChart3, BookOpen, Trophy, Zap } from 'lucide-react';
+import Link from 'next/link';
 
 const stats = [
   {
@@ -34,7 +35,7 @@ export default function DashboardPage() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-4xl font-bold text-foreground">Welcome Back</h1>
+        <h1 className="text-2xl font-bold text-foreground">Welcome Back</h1>
         <p className="text-muted-foreground mt-2">
           Continue your forensics skill development journey
         </p>
@@ -54,7 +55,7 @@ export default function DashboardPage() {
                   <p className="text-sm text-muted-foreground font-medium">
                     {stat.label}
                   </p>
-                  <p className="text-3xl font-bold text-foreground mt-2">
+                  <p className="text-2xl font-bold text-foreground mt-2">
                     {stat.value}
                   </p>
                 </div>
@@ -95,14 +96,22 @@ export default function DashboardPage() {
             Quick Actions
           </h2>
           <div className="space-y-3">
-            <button className="w-full px-4 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors">
+                        <button className="w-full px-4 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors">
+            <Link href='/assessment'>
               Start Assessment
+            </Link>
             </button>
-            <button className="w-full px-4 py-3 bg-muted text-foreground rounded-lg font-medium hover:bg-muted/80 transition-colors">
+
+ <button className="w-full px-4 py-3 bg-muted text-foreground rounded-lg font-medium hover:bg-muted/80 transition-colors">
+<Link href="results">
               View Results
+</Link>
             </button>
-            <button className="w-full px-4 py-3 bg-muted text-foreground rounded-lg font-medium hover:bg-muted/80 transition-colors">
-              Update Profile
+            
+           <button className="w-full px-4 py-3 bg-muted text-foreground rounded-lg font-medium hover:bg-muted/80 transition-colors">
+           <Link href='recommendations'>
+              Recommendations
+           </Link>
             </button>
           </div>
         </div>
