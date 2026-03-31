@@ -1,9 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { AlertCircle, CheckCircle2, Lock, Mail, User } from 'lucide-react';
+import { Lock, Mail, User } from 'lucide-react';
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function AuthForm({ type }: { type: 'login' | 'register' }) {
+  const router = useRouter();
+
   const isRegister = type === 'register';
 
   const [formData, setFormData] = useState({
@@ -14,11 +22,8 @@ export default function AuthForm({ type }: { type: 'login' | 'register' }) {
   });
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setError('');
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -27,37 +32,52 @@ export default function AuthForm({ type }: { type: 'login' | 'register' }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
-
-    if (isRegister && formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    if (!formData.email || !formData.password) {
-      setError('Please fill in all required fields');
-      return;
-    }
 
     setLoading(true);
+
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
       if (isRegister) {
-        console.log('Register:', formData);
-        setSuccess('Account created successfully! Redirecting...');
+        if (formData.password !== formData.confirmPassword) {
+          toast.error("Passwords do not match");
+          setLoading(false);
+          return;
+        }
+
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          formData.email,
+          formData.password
+        );
+
+        await setDoc(doc(db, "users", userCredential.user.uid), {
+          name: formData.name,
+          email: formData.email,
+          createdAt: new Date(),
+        });
+
+        toast.success("Account created successfully 🎉");
+
+        router.push("/dashboard");
+
       } else {
-        console.log('Login:', formData);
-        setSuccess('Login successful! Redirecting...');
+        await signInWithEmailAndPassword(
+          auth,
+          formData.email,
+          formData.password
+        );
+
+        toast.success("Login successful 👋");
+
+        router.push("/dashboard");
       }
-    } catch (err) {
-      setError('An error occurred. Please try again.');
+
+    } catch (error: any) {
+      toast.error(error.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -134,22 +154,6 @@ export default function AuthForm({ type }: { type: 'login' | 'register' }) {
               className="w-full pl-10 pr-4 py-3 bg-secondary/40 border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/50 transition-all"
             />
           </div>
-        </div>
-      )}
-
-      {/* Error Message */}
-      {error && (
-        <div className="flex items-start gap-2 p-3 bg-destructive/10 border border-destructive/30 rounded-lg">
-          <AlertCircle className="w-4 h-4 text-destructive mt-0.5 flex-shrink-0" />
-          <p className="text-sm text-destructive">{error}</p>
-        </div>
-      )}
-
-      {/* Success Message */}
-      {success && (
-        <div className="flex items-start gap-2 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
-          <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
-          <p className="text-sm text-green-400">{success}</p>
         </div>
       )}
 
