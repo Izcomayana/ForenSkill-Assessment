@@ -5,6 +5,7 @@ import { auth, db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { Card } from "@/components/ui/card";
+import { SpinnerCustom } from "@/components/ui/spinner";
 
 type Recommendation = {
   topic: string;
@@ -39,9 +40,13 @@ export default function RecommendationsPage() {
     return () => unsubscribe();
   }, []);
 
-  if (loading) {
-    return <p className="p-6">Loading recommendations...</p>;
-  }
+if (loading) {
+  return (
+    <div className="flex items-center justify-center min-h-screen w-full">
+      <SpinnerCustom />
+    </div>
+  );
+}
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">

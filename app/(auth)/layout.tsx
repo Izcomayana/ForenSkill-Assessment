@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import forenscore from "@/public/forenscore.png"
+import Image from 'next/image';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -27,18 +29,19 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="bg-card/80 backdrop-blur-xl border border-border rounded-2xl shadow-2xl p-8 sm:p-10">
 
           {/* Header */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-8 ">
+            {/* <Image src={forenscore} width={100} height={100} alt='forenscor-logo' className='mx-auto'/> */}
+
             <Link href="/" className="inline-block group">
               <div className="flex items-center justify-center gap-3 mb-4">
 
-                {/* Logo */}
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
                   <span className="text-white font-bold text-lg">F</span>
                 </div>
 
                 <span className="text-2xl font-bold tracking-tight">
-                  <span className="text-white">Foren</span>
-                  <span className="text-blue-400">Skill</span>
+                  <span className="text-white">foren</span>
+                  <span className="text-blue-400">score</span>
                 </span>
               </div>
             </Link>

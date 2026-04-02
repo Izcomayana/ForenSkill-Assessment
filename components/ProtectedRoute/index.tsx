@@ -3,6 +3,7 @@
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { SpinnerCustom } from '../ui/spinner';
 
 export default function ProtectedRoute({
   children,
@@ -19,7 +20,11 @@ export default function ProtectedRoute({
   }, [user, loading, router]);
 
   if (loading) {
-    return <p className="p-6">Checking authentication...</p>;
+    return (
+      <div className="p-6 mx-auto">
+        <SpinnerCustom />
+      </div>
+    )
   }
 
   if (!user) return null;

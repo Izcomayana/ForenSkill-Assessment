@@ -6,6 +6,8 @@ import { useState } from 'react';
 import { BarChart3, BookOpen, Home, LogOut, Settings, Info, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import LogoutButton from './Logout';
+import forenscore from "@/public/forenscore.png"
+import Image from 'next/image';
 
 const navItems = [
   {
@@ -38,8 +40,18 @@ export default function Sidebar() {
     <>
       {/* Logo Section */}
       <div className="p-6 border-b border-secondary/30 bg-background flex items-center justify-between">
+        {/* <Image src={forenscore} width={200} height={200} alt='forenscor-logo' className='mx-auto' /> */}
         <div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent">ForenSkill</h1>
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-lg">F</span>
+            </div>
+
+            <span className="text-xl font-bold tracking-tight">
+              <span className="text-white">foren</span>
+              <span className="text-blue-400">score</span>
+            </span>
+          </div>
           <p className="text-xs text-muted-foreground mt-1 font-medium">Forensics Platform</p>
         </div>
         {/* Close button for mobile */}
@@ -62,11 +74,10 @@ export default function Sidebar() {
               key={item.href}
               href={item.href}
               onClick={() => setIsOpen(false)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 group relative overflow-hidden ${
-                isActive
-                  ? 'bg-gradient-to-r from-secondary to-accent text-foreground shadow-lg shadow-secondary/30'
-                  : 'text-foreground hover:bg-secondary/20 hover:text-secondary'
-              }`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 group relative overflow-hidden ${isActive
+                ? 'bg-gradient-to-r from-secondary to-accent text-foreground shadow-lg shadow-secondary/30'
+                : 'text-foreground hover:bg-secondary/20 hover:text-secondary'
+                }`}
             >
               {isActive && (
                 <div className="absolute inset-0 bg-gradient-to-r from-secondary/20 to-accent/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -80,7 +91,7 @@ export default function Sidebar() {
 
       {/* Bottom Section */}
       <div className="p-4 border-t border-secondary/30 space-y-2">
-          <LogoutButton />
+        <LogoutButton />
       </div>
     </>
   );
@@ -110,9 +121,8 @@ export default function Sidebar() {
 
       {/* Sidebar - Mobile Slide-out */}
       <aside
-        className={`lg:hidden fixed top-0 left-0 h-screen w-64 bg-background border-r border-secondary/30 flex flex-col z-40 transition-transform duration-300 ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`lg:hidden fixed top-0 left-0 h-screen w-64 bg-background border-r border-secondary/30 flex flex-col z-40 transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         <NavContent />
       </aside>

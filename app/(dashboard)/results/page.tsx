@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { SpinnerCustom } from "@/components/ui/spinner";
 
 type ResultData = {
   score: number;
@@ -44,13 +45,13 @@ export default function ResultsPage() {
     return () => unsubscribe();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="p-8 text-center text-muted-foreground">
-        Loading results...
-      </div>
-    );
-  }
+if (loading) {
+  return (
+    <div className="flex items-center justify-center min-h-screen w-full">
+      <SpinnerCustom />
+    </div>
+  );
+}
 
   if (!data) {
     return (
