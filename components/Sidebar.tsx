@@ -42,17 +42,17 @@ export default function Sidebar() {
       <div className="p-6 border-b border-secondary/30 bg-background flex items-center justify-between">
         {/* <Image src={forenscore} width={200} height={200} alt='forenscor-logo' className='mx-auto' /> */}
         <div>
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+          <div className="flex items-center justify-center gap-3">
+            {/* <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
               <span className="text-white font-bold text-lg">F</span>
-            </div>
+            </div> */}
 
             <span className="text-xl font-bold tracking-tight">
               <span className="text-white">foren</span>
               <span className="text-blue-400">score</span>
             </span>
           </div>
-          <p className="text-xs text-muted-foreground mt-1 font-medium">Forensics Platform</p>
+          {/* <p className="text-xs text-muted-foreground mt-1 font-medium">Forensics Platform</p> */}
         </div>
         {/* Close button for mobile */}
         <button
