@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { BarChart3, BookOpen, Home, LogOut, Settings, Info, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import LogoutButton from './Logout';
 
 const navItems = [
   {
@@ -36,15 +37,15 @@ export default function Sidebar() {
   const NavContent = () => (
     <>
       {/* Logo Section */}
-      <div className="p-6 border-b border-border flex items-center justify-between">
+      <div className="p-6 border-b border-secondary/30 bg-background flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">ForenSkill</h1>
-          <p className="text-sm text-muted-foreground mt-1">Forensics Platform</p>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent">ForenSkill</h1>
+          <p className="text-xs text-muted-foreground mt-1 font-medium">Forensics Platform</p>
         </div>
         {/* Close button for mobile */}
         <button
           onClick={() => setIsOpen(false)}
-          className="lg:hidden text-muted-foreground hover:text-foreground"
+          className="lg:hidden text-muted-foreground hover:text-secondary transition-colors duration-200"
         >
           <X size={24} />
         </button>
@@ -61,41 +62,25 @@ export default function Sidebar() {
               key={item.href}
               href={item.href}
               onClick={() => setIsOpen(false)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 group relative overflow-hidden ${
                 isActive
-                  ? 'bg-secondary text-secondary-foreground shadow-lg'
-                  : 'text-foreground hover:bg-muted/50'
+                  ? 'bg-gradient-to-r from-secondary to-accent text-foreground shadow-lg shadow-secondary/30'
+                  : 'text-foreground hover:bg-secondary/20 hover:text-secondary'
               }`}
             >
-              <Icon size={20} />
-              <span className="font-medium">{item.label}</span>
+              {isActive && (
+                <div className="absolute inset-0 bg-gradient-to-r from-secondary/20 to-accent/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              )}
+              <Icon size={20} className="relative z-10" />
+              <span className="font-medium relative z-10">{item.label}</span>
             </Link>
           );
         })}
       </nav>
 
       {/* Bottom Section */}
-      <div className="p-4 border-t border-border space-y-2">
-        <Link
-          href="/dashboard/settings"
-          onClick={() => setIsOpen(false)}
-          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-            pathname === '/dashboard/settings'
-              ? 'bg-secondary text-secondary-foreground shadow-lg'
-              : 'text-foreground hover:bg-muted/50'
-          }`}
-        >
-          <Settings size={20} />
-          <span className="font-medium">Settings</span>
-        </Link>
-
-        <Button
-          variant="ghost"
-          className="w-full justify-start text-foreground hover:bg-muted/50"
-        >
-          <LogOut size={20} />
-          <span className="font-medium">Logout</span>
-        </Button>
+      <div className="p-4 border-t border-secondary/30 space-y-2">
+          <LogoutButton />
       </div>
     </>
   );
@@ -105,7 +90,7 @@ export default function Sidebar() {
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-card border border-border text-foreground hover:bg-muted/50 transition-colors"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-gradient-to-br from-secondary/30 to-accent/20 border border-secondary/50 text-secondary hover:border-secondary/80 hover:shadow-lg hover:shadow-secondary/20 transition-all duration-300"
       >
         <Menu size={24} />
       </button>
@@ -113,19 +98,19 @@ export default function Sidebar() {
       {/* Mobile Overlay */}
       {isOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/50 z-30 transition-opacity"
+          className="lg:hidden fixed inset-0 bg-black/70 z-30 transition-opacity backdrop-blur-sm"
           onClick={() => setIsOpen(false)}
         />
       )}
 
       {/* Sidebar - Desktop Fixed */}
-      <aside className="hidden lg:flex h-screen w-64 bg-card border-r border-border flex-col fixed left-0 top-0 z-40">
+      <aside className="hidden lg:flex h-screen w-64 bg-background border-r border-secondary/30 flex-col fixed left-0 top-0 z-40">
         <NavContent />
       </aside>
 
       {/* Sidebar - Mobile Slide-out */}
       <aside
-        className={`lg:hidden fixed top-0 left-0 h-screen w-64 bg-card border-r border-border flex flex-col z-40 transition-transform duration-300 ${
+        className={`lg:hidden fixed top-0 left-0 h-screen w-64 bg-background border-r border-secondary/30 flex flex-col z-40 transition-transform duration-300 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -136,45 +121,58 @@ export default function Sidebar() {
 }
 
 
+
 // 'use client';
 
 // import Link from 'next/link';
 // import { usePathname } from 'next/navigation';
-// import { BarChart3, BookOpen, Home, LogOut, Settings, Info, } from 'lucide-react';
+// import { useState } from 'react';
+// import { BarChart3, BookOpen, Home, LogOut, Settings, Info, Menu, X } from 'lucide-react';
+// import { Button } from '@/components/ui/button';
 // import LogoutButton from './Logout';
 
 // const navItems = [
-  // {
-  //   label: 'Dashboard',
-  //   href: '/dashboard',
-  //   icon: Home,
-  // },
-  // {
-  //   label: 'Assessment',
-  //   href: '/assessment',
-  //   icon: BookOpen,
-  // },
-  // {
-  //   label: 'Results',
-  //   href: '/results',
-  //   icon: BarChart3,
-  // },
-  // {
-  //   label: 'Recommendations',
-  //   href: '/recommendations',
-  //   icon: Info,
-  // },
+//   {
+//     label: 'Dashboard',
+//     href: '/dashboard',
+//     icon: Home,
+//   },
+//   {
+//     label: 'Assessment',
+//     href: '/assessment',
+//     icon: BookOpen,
+//   },
+//   {
+//     label: 'Results',
+//     href: '/results',
+//     icon: BarChart3,
+//   },
+//   {
+//     label: 'Recommendations',
+//     href: '/recommendations',
+//     icon: Info,
+//   },
 // ];
 
 // export default function Sidebar() {
 //   const pathname = usePathname();
+//   const [isOpen, setIsOpen] = useState(false);
 
-//   return (
-//     <aside className="h-screen w-64 bg-card border-r border-border flex flex-col fixed left-0 top-0">
+//   const NavContent = () => (
+//     <>
 //       {/* Logo Section */}
-//       <div className="p-6 border-b border-border">
-//         <h1 className="text-2xl font-bold text-primary">ForenSkill</h1>
-//         <p className="text-sm text-muted-foreground mt-1">Forensics Platform</p>
+//       <div className="p-6 border-b border-secondary/30 bg-background flex items-center justify-between">
+//         <div>
+//           <h1 className="text-2xl font-bold bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent">ForenSkill</h1>
+//           <p className="text-xs text-muted-foreground mt-1 font-medium">Forensics Platform</p>
+//         </div>
+//         {/* Close button for mobile */}
+//         <button
+//           onClick={() => setIsOpen(false)}
+//           className="lg:hidden text-muted-foreground hover:text-secondary transition-colors duration-200"
+//         >
+//           <X size={24} />
+//         </button>
 //       </div>
 
 //       {/* Navigation */}
@@ -187,36 +185,62 @@ export default function Sidebar() {
 //             <Link
 //               key={item.href}
 //               href={item.href}
-//               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${isActive
-//                   ? 'bg-primary text-primary-foreground shadow-lg'
-//                   : 'text-foreground hover:bg-muted/50'
-//                 }`}
+//               onClick={() => setIsOpen(false)}
+//               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 group relative overflow-hidden ${
+//                 isActive
+//                   ? 'bg-gradient-to-r from-secondary to-accent text-foreground shadow-lg shadow-secondary/30'
+//                   : 'text-foreground hover:bg-secondary/20 hover:text-secondary'
+//               }`}
 //             >
-//               <Icon size={20} />
-//               <span className="font-medium">{item.label}</span>
+//               {isActive && (
+//                 <div className="absolute inset-0 bg-gradient-to-r from-secondary/20 to-accent/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+//               )}
+//               <Icon size={20} className="relative z-10" />
+//               <span className="font-medium relative z-10">{item.label}</span>
 //             </Link>
 //           );
 //         })}
 //       </nav>
 
 //       {/* Bottom Section */}
-//       <div className="p-4 border-t border-border space-y-2">
-//         <Link
-//           href="/dashboard/settings"
-//           className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${pathname === '/dashboard/settings'
-//               ? 'bg-primary text-primary-foreground shadow-lg'
-//               : 'text-foreground hover:bg-muted/50'
-//             }`}
-//         >
-//           <Settings size={20} />
-//           <span className="font-medium">Settings</span>
-//         </Link>
-
-
-//         <div className="mt-auto pt-6 border-t border-border">
+//       <div className="p-4 border-t border-secondary/30 space-y-2">
 //           <LogoutButton />
-//         </div>
 //       </div>
-//     </aside>
+//     </>
+//   );
+
+//   return (
+//     <>
+//       {/* Mobile Menu Button */}
+//       <button
+//         onClick={() => setIsOpen(!isOpen)}
+//         className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-gradient-to-br from-secondary/30 to-accent/20 border border-secondary/50 text-secondary hover:border-secondary/80 hover:shadow-lg hover:shadow-secondary/20 transition-all duration-300"
+//       >
+//         <Menu size={24} />
+//       </button>
+
+//       {/* Mobile Overlay */}
+//       {isOpen && (
+//         <div
+//           className="lg:hidden fixed inset-0 bg-black/70 z-30 transition-opacity backdrop-blur-sm"
+//           onClick={() => setIsOpen(false)}
+//         />
+//       )}
+
+//       {/* Sidebar - Desktop Fixed */}
+//       <aside className="hidden lg:flex h-screen w-64 bg-background border-r border-secondary/30 flex-col fixed left-0 top-0 z-40">
+//         <NavContent />
+//       </aside>
+
+//       {/* Sidebar - Mobile Slide-out */}
+//       <aside
+//         className={`lg:hidden fixed top-0 left-0 h-screen w-64 bg-background border-r border-secondary/30 flex flex-col z-40 transition-transform duration-300 ${
+//           isOpen ? 'translate-x-0' : '-translate-x-full'
+//         }`}
+//       >
+//         <NavContent />
+//       </aside>
+//     </>
 //   );
 // }
+
