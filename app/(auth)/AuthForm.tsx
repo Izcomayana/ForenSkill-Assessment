@@ -1,16 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import { AlertCircle, CheckCircle2, Lock, Mail, User } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
+import { SpinnerCustom } from "@/components/ui/spinner"
 
 export default function AuthForm({ type }: { type: 'login' | 'register' }) {
   const router = useRouter();
+
+    const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const isRegister = type === 'register';
 
@@ -95,7 +99,6 @@ export default function AuthForm({ type }: { type: 'login' | 'register' }) {
               value={formData.name}
               onChange={handleChange}
               className="w-full pl-12 pr-4 py-3 bg-muted/50 border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all hover:border-blue-400"
-              // className="w-full pl-12 pr-4 py-3 bg-muted border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 transition-all"
             />
           </div>
         </div>
@@ -107,7 +110,7 @@ export default function AuthForm({ type }: { type: 'login' | 'register' }) {
           Email Address
         </label>
         <div className="relative group">
-         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-accent transition-colors" />
+          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-accent transition-colors" />
           <input
             type="email"
             name="email"
@@ -115,7 +118,6 @@ export default function AuthForm({ type }: { type: 'login' | 'register' }) {
             value={formData.email}
             onChange={handleChange}
             className="w-full pl-12 pr-4 py-3 bg-muted/50 border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all hover:border-blue-400"
-            // className="w-full pl-12 pr-4 py-3 bg-muted border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 transition-all"
           />
         </div>
       </div>
@@ -128,14 +130,20 @@ export default function AuthForm({ type }: { type: 'login' | 'register' }) {
         <div className="relative group">
           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-accent transition-colors" />
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             name="password"
             placeholder="••••••••"
             value={formData.password}
             onChange={handleChange}
             className="w-full pl-12 pr-4 py-3 bg-muted/50 border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all hover:border-blue-400"
-            // className="w-full pl-12 pr-4 py-3 bg-muted border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 transition-all"
           />
+                    <button
+            type="button"
+            onClick={() => setShowPassword(prev => !prev)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          >
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
         </div>
       </div>
 
@@ -148,14 +156,20 @@ export default function AuthForm({ type }: { type: 'login' | 'register' }) {
           <div className="relative group">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-accent transition-colors" />
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="confirmPassword"
               placeholder="••••••••"
               value={formData.confirmPassword}
               onChange={handleChange}
               className="w-full pl-12 pr-4 py-3 bg-muted/50 border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all hover:border-blue-400"
-              // className="w-full pl-12 pr-4 py-3 bg-muted border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 transition-all"
             />
+                      <button
+            type="button"
+            onClick={() => setShowPassword(prev => !prev)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          >
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
           </div>
         </div>
       )}
@@ -165,11 +179,10 @@ export default function AuthForm({ type }: { type: 'login' | 'register' }) {
         type="submit"
         disabled={loading}
         className="w-full py-3 px-4 mt-6 bg-gradient-to-r from-blue-600 via-indigo-500 to-blue-500 hover:from-blue-500 hover:to-indigo-400 text-white font-semibold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-blue-500/20 hover:scale-[1.02] disabled:opacity-50"
-        // className="w-full py-3 px-4 mt-6 bg-gradient-to-r from-accent via-cyan-400 to-cyan-500 hover:from-accent/90 hover:via-cyan-400/90 hover:to-cyan-500/90 disabled:from-muted disabled:to-muted text-accent-foreground font-semibold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:cursor-not-allowed border border-accent/20"
       >
         {loading ? (
           <>
-            <div className="w-4 h-4 border-2 border-accent-foreground/30 border-t-accent-foreground rounded-full animate-spin"></div>
+            <SpinnerCustom />
             <span>{isRegister ? 'Creating Account...' : 'Signing In...'}</span>
           </>
         ) : (
@@ -204,73 +217,73 @@ export default function AuthForm({ type }: { type: 'login' | 'register' }) {
 // import { toast } from "sonner";
 
 // export default function AuthForm({ type }: { type: 'login' | 'register' }) {
-  // const router = useRouter();
+// const router = useRouter();
 
-  // const isRegister = type === 'register';
+// const isRegister = type === 'register';
 
-  // const [formData, setFormData] = useState({
-  //   name: '',
-  //   email: '',
-  //   password: '',
-  //   confirmPassword: '',
-  // });
+// const [formData, setFormData] = useState({
+//   name: '',
+//   email: '',
+//   password: '',
+//   confirmPassword: '',
+// });
 
-  // const [loading, setLoading] = useState(false);
+// const [loading, setLoading] = useState(false);
 
-  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setFormData({
-  //     ...formData,
-  //     [e.target.name]: e.target.value,
-  //   });
-  // };
+// const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//   setFormData({
+//     ...formData,
+//     [e.target.name]: e.target.value,
+//   });
+// };
 
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
+// const handleSubmit = async (e: React.FormEvent) => {
+//   e.preventDefault();
 
-  //   setLoading(true);
+//   setLoading(true);
 
-  //   try {
-  //     if (isRegister) {
-  //       if (formData.password !== formData.confirmPassword) {
-  //         toast.error("Passwords do not match");
-  //         setLoading(false);
-  //         return;
-  //       }
+//   try {
+//     if (isRegister) {
+//       if (formData.password !== formData.confirmPassword) {
+//         toast.error("Passwords do not match");
+//         setLoading(false);
+//         return;
+//       }
 
-  //       const userCredential = await createUserWithEmailAndPassword(
-  //         auth,
-  //         formData.email,
-  //         formData.password
-  //       );
+//       const userCredential = await createUserWithEmailAndPassword(
+//         auth,
+//         formData.email,
+//         formData.password
+//       );
 
-  //       await setDoc(doc(db, "users", userCredential.user.uid), {
-  //         name: formData.name,
-  //         email: formData.email,
-  //         createdAt: new Date(),
-  //       });
+//       await setDoc(doc(db, "users", userCredential.user.uid), {
+//         name: formData.name,
+//         email: formData.email,
+//         createdAt: new Date(),
+//       });
 
-  //       toast.success("Account created successfully 🎉");
+//       toast.success("Account created successfully 🎉");
 
-  //       router.push("/dashboard");
+//       router.push("/dashboard");
 
-  //     } else {
-  //       await signInWithEmailAndPassword(
-  //         auth,
-  //         formData.email,
-  //         formData.password
-  //       );
+//     } else {
+//       await signInWithEmailAndPassword(
+//         auth,
+//         formData.email,
+//         formData.password
+//       );
 
-  //       toast.success("Login successful 👋");
+//       toast.success("Login successful 👋");
 
-  //       router.push("/dashboard");
-  //     }
+//       router.push("/dashboard");
+//     }
 
-  //   } catch (error: any) {
-  //     toast.error(error.message || "Something went wrong");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+//   } catch (error: any) {
+//     toast.error(error.message || "Something went wrong");
+//   } finally {
+//     setLoading(false);
+//   }
+// };
 
 //   return (
 //     <form onSubmit={handleSubmit} className="space-y-4">
