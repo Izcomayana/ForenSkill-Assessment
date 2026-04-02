@@ -14,7 +14,7 @@ export default function RegisterPage() {
       </div>
 
       <Link href="/login" className="block">
-        <button className="w-full py-3 px-4 bg-secondary hover:bg-muted disabled:bg-muted/60 text-secondary-foreground font-semibold rounded-lg transition-all duration-200">
+        <button  className="w-full py-3 px-4 mt-6 bg-gradient-to-r from-blue-600 via-indigo-500 to-blue-500 hover:from-blue-500 hover:to-indigo-400 text-white font-semibold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-blue-500/20 hover:scale-[1.02] disabled:opacity-50">
           Sign In
         </button>
       </Link>

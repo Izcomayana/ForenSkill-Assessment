@@ -1,13 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "sonner";
-import { Inter } from "next/font/google";
 import { AuthProvider } from '@/context/AuthContext';
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -22,7 +16,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${inter.variable} h-full antialiased`}
+      className="h-full antialiased dark"
     >
       <body className="min-h-full flex flex-col">
         <AuthProvider>
