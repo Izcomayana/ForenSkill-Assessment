@@ -109,21 +109,6 @@ useEffect(() => {
 
   return recommendations;
 };
-
-  // const generateRecommendations = (topicScores: Record<string, number>) => {
-  //   const recommendations: string[] = [];
-
-  //   Object.entries(topicScores).forEach(([topic, score]) => {
-  //     if (score < 50) {
-  //       recommendations.push(`${topic}: Beginner - Needs improvement`);
-  //     } else if (score < 70) {
-  //       recommendations.push(`${topic}: Intermediate - Review recommended`);
-  //     }
-  //   });
-
-  //   return recommendations;
-  // };
-
   const router = useRouter();
 
   const handleSubmit = async () => {
@@ -175,10 +160,6 @@ useEffect(() => {
     }
   };
 
-  // const handleSubmit = () => {
-  //   setIsSubmitted(true);
-  // };
-
   const calculateScore = () => {
     let correctCount = 0;
     questions.forEach((q) => {
@@ -191,15 +172,15 @@ useEffect(() => {
 
   return (
     <>
-      <div className="min-h-screen bg-background p-4 md:p-8">
-        <div className="max-w-3xl mx-auto">
+      <div className="min-h-screen bg-background p-4 md:p-8 overflow-x-hidden">
+        <div className="max-w-3xl mx-auto w-full">
           {/* Header Section */}
           <div className="space-y-6 mb-8">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
                 Digital Forensics Assessment
               </h1>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-sm ">
                 Test your knowledge of forensic principles and practices
               </p>
             </div>
@@ -239,7 +220,7 @@ useEffect(() => {
                   const isSelected = selectedAnswer === index;
                   const isCorrect = index === currentQuestion.correctAnswer;
                   let className =
-                    'relative flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:border-primary/50 hover:bg-secondary/50';
+                    'relative flex items-start gap-4 p-4 rounded-lg text-left break-words border-2 cursor-pointer transition-all duration-200 hover:border-primary/50 hover:bg-secondary/50';
 
                   if (isSelected && !isSubmitted) {
                     className +=
@@ -301,7 +282,7 @@ useEffect(() => {
           </Card>
 
           {/* Navigation Section */}
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <Button
               variant="outline"
               size="lg"
@@ -313,7 +294,7 @@ useEffect(() => {
               Previous
             </Button>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 overflow-x-auto max-w-full">
               {questions.map((_, idx) => (
                 <button
                   key={idx}
