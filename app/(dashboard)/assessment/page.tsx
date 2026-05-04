@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { auth, db } from "@/lib/firebase";
 import { doc, setDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
+import { collection, addDoc } from "firebase/firestore";
 
 export default function AssessmentPage() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -17,26 +18,42 @@ export default function AssessmentPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [sessionQuestions, setSessionQuestions] = useState<any[]>([]);
 
-  const currentQuestion = questions[currentQuestionIndex];
-  const progressPercentage = ((currentQuestionIndex + 1) / questions.length) * 100;
-  const selectedAnswer = answers[currentQuestion.id];
-  const isAnswered = selectedAnswer !== undefined;
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserId(user.uid);
+      }
+    });
 
-useEffect(() => {
-  const unsubscribe = onAuthStateChanged(auth, (user) => {
-    if (user) {
-      setUserId(user.uid);
-    }
-  });
+    const generateQuestions = async () => {
+      const shuffledPool = shuffleArray(questions);
+      const selected = shuffledPool.slice(0, 10);
 
-  return () => unsubscribe();
-}, []);
+      const processed = await Promise.all(
+        selected.map(async (q) => {
+          const newQuestion = await rephraseQuestion(q.question);
+
+          return shuffleQuestion({
+            ...q,
+            question: newQuestion,
+          });
+        })
+      );
+
+      setSessionQuestions(processed);
+    };
+
+    generateQuestions(); // ✅ NOW IT RUNS
+
+    return () => unsubscribe();
+  }, []);
 
   const calculateTopicScores = () => {
     const topicStats: Record<string, { correct: number; total: number }> = {};
 
-    questions.forEach((q) => {
+    sessionQuestions.forEach((q) => {
       if (!topicStats[q.topic]) {
         topicStats[q.topic] = { correct: 0, total: 0 };
       }
@@ -59,56 +76,57 @@ useEffect(() => {
   };
 
   const generateRecommendations = (topicScores: Record<string, number>) => {
-  const recommendations: {
-    topic: string;
-    level: string;
-    message: string;
-    modules: string[];
-  }[] = [];
+    const recommendations: {
+      topic: string;
+      level: string;
+      message: string;
+      modules: string[];
+    }[] = [];
 
-  const moduleMap: Record<string, string[]> = {
-    "Digital Evidence": [
-      "Introduction to Digital Evidence",
-      "Types of Digital Evidence",
-      "Evidence Integrity and Hashing",
-    ],
-    "Chain of Custody": [
-      "Evidence Handling and Documentation",
-      "Maintaining Chain of Custody Records",
-      "Legal Importance of Chain of Custody",
-    ],
-    "Forensic Tools": [
-      "Introduction to Autopsy",
-      "Using FTK Imager",
-      "Disk Imaging and Analysis",
-    ],
-    "Legal Issues": [
-      "Legal and Ethical Requirements in Digital Investigations",
-      "Admissibility of Digital Evidence",
-      "Privacy and Cyber Laws",
-    ],
+    const moduleMap: Record<string, string[]> = {
+      "Digital Evidence": [
+        "Introduction to Digital Evidence",
+        "Types of Digital Evidence",
+        "Evidence Integrity and Hashing",
+      ],
+      "Chain of Custody": [
+        "Evidence Handling and Documentation",
+        "Maintaining Chain of Custody Records",
+        "Legal Importance of Chain of Custody",
+      ],
+      "Forensic Tools": [
+        "Introduction to Autopsy",
+        "Using FTK Imager",
+        "Disk Imaging and Analysis",
+      ],
+      "Legal Issues": [
+        "Legal and Ethical Requirements in Digital Investigations",
+        "Admissibility of Digital Evidence",
+        "Privacy and Cyber Laws",
+      ],
+    };
+
+    Object.entries(topicScores).forEach(([topic, score]) => {
+      if (score < 50) {
+        recommendations.push({
+          topic,
+          level: "Beginner",
+          message: `You need significant improvement in ${topic}.`,
+          modules: moduleMap[topic],
+        });
+      } else if (score < 70) {
+        recommendations.push({
+          topic,
+          level: "Intermediate",
+          message: `You have basic understanding of ${topic}, but improvement is needed.`,
+          modules: moduleMap[topic].slice(0, 2),
+        });
+      }
+    });
+
+    return recommendations;
   };
 
-  Object.entries(topicScores).forEach(([topic, score]) => {
-    if (score < 50) {
-      recommendations.push({
-        topic,
-        level: "Beginner",
-        message: `You need significant improvement in ${topic}.`,
-        modules: moduleMap[topic],
-      });
-    } else if (score < 70) {
-      recommendations.push({
-        topic,
-        level: "Intermediate",
-        message: `You have basic understanding of ${topic}, but improvement is needed.`,
-        modules: moduleMap[topic].slice(0, 2),
-      });
-    }
-  });
-
-  return recommendations;
-};
   const router = useRouter();
 
   const handleSubmit = async () => {
@@ -121,7 +139,15 @@ useEffect(() => {
 
       // 🔥 Save to Firebase
       if (userId) {
-        await setDoc(doc(db, "results", userId), {
+        await setDoc(
+          await addDoc(collection(db, "users", userId, "results"), {
+            score: percentage,
+            correct,
+            total,
+            topicScores,
+            recommendations,
+            createdAt: new Date(),
+          }), {
           score: percentage,
           correct,
           total,
@@ -149,7 +175,7 @@ useEffect(() => {
   };
 
   const nextQuestion = () => {
-    if (currentQuestionIndex < questions.length - 1) {
+    if (currentQuestionIndex < sessionQuestions.length - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
     }
   };
@@ -162,13 +188,55 @@ useEffect(() => {
 
   const calculateScore = () => {
     let correctCount = 0;
-    questions.forEach((q) => {
+    sessionQuestions.forEach((q) => {
       if (answers[q.id] === q.correctAnswer) {
         correctCount++;
       }
     });
-    return { correct: correctCount, total: questions.length };
+    return { correct: correctCount, total: sessionQuestions.length };
   };
+
+  function shuffleArray<T>(array: T[]): T[] {
+    return [...array].sort(() => Math.random() - 0.5);
+  }
+
+  // Shuffle options but keep correct answer tracked
+  function shuffleQuestion(q: any) {
+    const optionsWithIndex: { text: string; isCorrect: boolean }[] =
+      q.options.map((opt: string, idx: number) => ({
+        text: opt,
+        isCorrect: idx === q.correctAnswer,
+      }));
+
+    const shuffled = shuffleArray(optionsWithIndex);
+
+    return {
+      ...q,
+      options: shuffled.map((o: { text: string }) => o.text),
+      correctAnswer: shuffled.findIndex(
+        (o: { isCorrect: boolean }) => o.isCorrect
+      ),
+    };
+  }
+
+  // (Optional AI layer — safe fallback for now)
+  async function rephraseQuestion(question: string) {
+    // 🔥 For now: simulate AI (safe for defense demo)
+    return question.replace("What is", "Which statement best describes");
+
+    // Later you can plug real OpenAI API here
+  }
+
+  if (sessionQuestions.length === 0) {
+    return <div className="p-6">Loading assessment...</div>;
+  }
+
+  const currentQuestion = sessionQuestions[currentQuestionIndex];
+  const progressPercentage =
+    ((currentQuestionIndex + 1) / sessionQuestions.length) * 100;
+
+  const selectedAnswer = answers[currentQuestion.id];
+  const isAnswered = selectedAnswer !== undefined;
 
   return (
     <>
@@ -189,7 +257,7 @@ useEffect(() => {
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-sm text-muted-foreground mb-2">
-                  Question {currentQuestionIndex + 1} of {questions.length}
+                  Question {currentQuestionIndex + 1} of {sessionQuestions.length}
                 </div>
                 <Progress value={progressPercentage} className="h-2" />
               </div>
@@ -216,7 +284,7 @@ useEffect(() => {
                 <p className="text-sm font-medium text-muted-foreground mb-4">
                   Select the best answer
                 </p>
-                {currentQuestion.options.map((option, index) => {
+                {currentQuestion.options.map((option: any, index: any) => {
                   const isSelected = selectedAnswer === index;
                   const isCorrect = index === currentQuestion.correctAnswer;
                   let className =
@@ -295,13 +363,13 @@ useEffect(() => {
             </Button>
 
             <div className="flex gap-2 overflow-x-auto max-w-full">
-              {questions.map((_, idx) => (
+              {sessionQuestions.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => setCurrentQuestionIndex(idx)}
                   className={`w-3 h-3 rounded-full transition-all duration-200 ${idx === currentQuestionIndex
                     ? 'bg-primary w-8'
-                    : answers[questions[idx].id] !== undefined
+                    : answers[sessionQuestions[idx].id] !== undefined
                       ? 'bg-primary/50'
                       : 'bg-border'
                     }`}
@@ -310,11 +378,11 @@ useEffect(() => {
               ))}
             </div>
 
-            {currentQuestionIndex === questions.length - 1 ? (
+            {currentQuestionIndex === sessionQuestions.length - 1 ? (
               <Button
                 size="lg"
                 onClick={handleSubmit}
-                disabled={Object.keys(answers).length !== questions.length}
+                disabled={Object.keys(answers).length !== sessionQuestions.length}
                 className="gap-2"
               >
                 Submit Assessment
@@ -335,7 +403,7 @@ useEffect(() => {
           {/* Answering Status */}
           {!isSubmitted && (
             <div className="mt-6 text-center text-sm text-muted-foreground">
-              {Object.keys(answers).length} of {questions.length} questions answered
+              {Object.keys(answers).length} of {sessionQuestions.length} questions answered
             </div>
           )}
         </div>
