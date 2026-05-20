@@ -1,32 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import forenscore from "@/public/forenscore.png"
-import Image from 'next/image';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
-
-      {/* 🔥 Gradient background glow */}
-      <div className="absolute inset-0">
-        <div className="absolute top-[-100px] left-[-100px] w-[400px] h-[400px] bg-blue-600/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] bg-indigo-600/20 rounded-full blur-3xl" />
-      </div>
-
-      {/* 🔲 Grid overlay (for tech feel) */}
-      <div className="absolute inset-0 opacity-10"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
-        }}
-      />
+    <div className="min-h-screen flex items-center justify-center bg-[#F5F7F4] relative overflow-hidden px-4">
 
       <div className="w-full max-w-md relative my-10 z-10">
 
         {/* Card */}
-        <div className="bg-card/80 backdrop-blur-xl border border-border rounded-2xl shadow-2xl p-8 sm:p-10">
+        <div className="bg-white border border-gray-200 rounded-[32px] shadow-sm p-8 sm:p-10">
 
           {/* Header */}
           <div className="text-center mb-8 ">
@@ -40,8 +23,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                 </div> */}
 
                 <span className="text-2xl font-bold tracking-tight">
-                  <span className="text-white">foren</span>
-                  <span className="text-blue-400">score</span>
+                  <span className="text-gray-900">foren</span>
+                  <span className="text-green-500">score</span>
                 </span>
               </div>
             </Link>

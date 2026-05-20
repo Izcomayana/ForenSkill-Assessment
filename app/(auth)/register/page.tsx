@@ -9,7 +9,7 @@ export default function RegisterPage() {
       <div className="relative">
         <hr />
         <div className="relative flex justify-center text-sm mt-4">
-          <span className="px-3 text-gray-200">Already have an account?</span>
+          <span className="px-3 text-gray-700">Already have an account?</span>
         </div>
       </div>
 
