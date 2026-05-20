@@ -23,7 +23,7 @@ export default function LoginPage() {
       <div className="relative">
         <hr />
         <div className="relative flex justify-center text-sm mt-4">
-          <span className="px-3 text-gray-200">New to ForenSkill?</span>
+          <span className="px-3 text-gray-600">New to ForenSkill?</span>
         </div>
       </div>
 
