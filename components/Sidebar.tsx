@@ -3,11 +3,9 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { BarChart3, BookOpen, Home, LogOut, Settings, Info, Menu, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { BarChart3, BookOpen, Home, Info, Menu, X } from 'lucide-react';
+
 import LogoutButton from './Logout';
-import forenscore from "@/public/forenscore.png"
-import Image from 'next/image';
 
 const navItems = [
   {
@@ -49,7 +47,7 @@ export default function Sidebar() {
 
             <span className="text-xl font-bold tracking-tight">
               <span className="text-white">foren</span>
-              <span className="text-blue-400">score</span>
+              <span className="text-[#23ad57]">score</span>
             </span>
           </div>
           {/* <p className="text-xs text-muted-foreground mt-1 font-medium">Forensics Platform</p> */}
