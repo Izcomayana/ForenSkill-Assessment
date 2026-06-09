@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F5F7F4] relative overflow-hidden px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#151922] relative overflow-hidden px-4">
 
       <div className="w-full max-w-md relative my-10 z-10">
 
